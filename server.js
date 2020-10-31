@@ -34,6 +34,8 @@ const db = mongoose.connection;
 db.on("error", (error) => console.error(error));
 db.once("open", () => {
   console.log("Connected to MongoDB");
+
+  // Pusher module to watch 'messages' collection on mongodb
   const msgCollection = db.collection("messages");
   const changeStream = msgCollection.watch();
 
@@ -43,15 +45,17 @@ db.once("open", () => {
 
       pusher.trigger("messages", "inserted", {
         name: messageDetails.name,
-        message: messageDetails.message
+        message: messageDetails.message,
+        timestamp: messageDetails.timestamp,
+        received: messageDetails.received
       });
     } else {
-      console.log("Error triggering Pusher!");
+      console.log("Error triggering Pusher!", change);
     }
   });
 });
 
-// ???
+// ??? (other stuff here)
 
 // api routes
 app.get("/", (req, res) => {
